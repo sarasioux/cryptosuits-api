@@ -37,9 +37,6 @@ router.get('/json/:id', function(req, res) {
                   json.ipfs = json.image;
                   json.image = siteUrl + 'image/' + id;
                   
-                  // Pick a color
-                  json.background_color = colors[id % 4];
-                  
                   // Set the name
                   json.name = 'CryptoSuit #' + id;
                   
@@ -77,7 +74,8 @@ router.get('/image/:id', function(req, res) {
   const id = req.params.id;
   const data = fs.readFileSync('./tokens/output3/' + id + '.json');
   const json = JSON.parse(data);
-  let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><image href="${json.image}" height="1000" width="1000" style="image-rendering: pixelated" /></svg>`;
+  const color = colors[id % 4];
+  let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><rect width="100%" height="100%" fill="#${color}" /><image href="${json.image}" height="1000" width="1000" style="image-rendering: pixelated" /></svg>`;
   convert(svg, {width: 1000, height: 1000, puppeteer: { timeout: 0, args: ['--no-sandbox', '--disable-setuid-sandbox']}}).then((png) => {
     res.set('Content-Type', 'image/png');
     res.send(png);

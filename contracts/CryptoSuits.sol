@@ -26,9 +26,6 @@ contract CryptoSuits is ERC721Burnable, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
-    // On-Chain Storage
-    string public imageTx = '';
-    string public metadataTx = '';
     string public baseUri;
 
     // Sales
@@ -37,12 +34,14 @@ contract CryptoSuits is ERC721Burnable, Ownable {
     uint public constant maxPurchase = 20;
     uint public constant maxSupply = 10000;
 
-    // Internals
-    event Minted(address minter, address receiver, uint256 tokenId);
-    event SaleChanged(bool saleState);
+    // Team
+    address private sara = 0x00796e910Bd0228ddF4cd79e3f353871a61C351C;
+    address private greg = 0x7fc55376D5A29e0Ee86C18C81bb2fC8F9f490E50;
+    address private steve = 0xBa48044540aB8cDAEe47a338844100a0aE756a8d;
+
 
     // Constructor
-    constructor() ERC721("CryptoSuit", "CRYPTOSUIT") {}
+    constructor() ERC721("CryptoSuits", "CRYPTOSUIT") {}
 
     /*
     *   Getters.
@@ -64,10 +63,6 @@ contract CryptoSuits is ERC721Burnable, Ownable {
     */
 
     function mint(uint numberOfTokens) public payable {
-        mint(numberOfTokens, msg.sender);
-    }
-
-    function mint(uint numberOfTokens, address owner) public payable {
         require(saleStarted(), "Wait for the sale to start!");
         require(numberOfTokens <= maxPurchase, "Maximum 20!");
         require(_tokenIds.current().add(numberOfTokens) <= maxSupply, "Exceeding max supply!");
@@ -75,8 +70,7 @@ contract CryptoSuits is ERC721Burnable, Ownable {
 
         for(uint i = 0; i < numberOfTokens; i++) {
             _tokenIds.increment();
-            _safeMint(owner, _tokenIds.current());
-            emit Minted(msg.sender, owner, _tokenIds.current());
+            _safeMint(msg.sender, _tokenIds.current());
         }
     }
 
@@ -117,30 +111,19 @@ contract CryptoSuits is ERC721Burnable, Ownable {
         price = _price;
     }
 
-    function setProvenance(string memory _imageTx, string memory _metadataTx) public onlyOwner {
-        imageTx = _imageTx;
-        metadataTx = _metadataTx;
-    }
-
     /*
     *   Money management.
     */
     function withdraw() public payable onlyOwner {
         uint256 _each = address(this).balance / 3;
-        require(payable(0x00796e910Bd0228ddF4cd79e3f353871a61C351C).send(_each));   // sara  @altcryp
-        require(payable(0x7fc55376D5A29e0Ee86C18C81bb2fC8F9f490E50).send(_each));   // shaun @sircryptos
-        require(payable(0xB58Fb5372e9Aa0C86c3B281179c05Af3bB7a181b).send(_each));   // mark  @linedetail
+        require(payable(sara).send(_each));
+        require(payable(greg).send(_each));
+        require(payable(steve).send(_each));
     }
 
     function forwardERC20s(IERC20 _token, uint256 _amount) public onlyOwner {
         _token.transfer(msg.sender, _amount);
     }
-
-    /*
-    *   On chain storage.
-    */
-    function uploadImages(bytes calldata s) external onlyOwner {}
-    function uploadAttributes(bytes calldata s) external onlyOwner {}
 
     /*
     *   Overrides
