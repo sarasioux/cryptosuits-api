@@ -1,0 +1,12 @@
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+figure {
+    display: block;
+    width: 1000px;
+    height: 1000px;
+    padding: 0;
+    margin: 0;
+}

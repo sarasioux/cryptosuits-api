@@ -5,7 +5,8 @@ const commands = [
   'ipfs 1',
   'ipfs 1-20',
   'rehash',
-  'renumber'
+  'renumber',
+  'ipfs-folder'
   
 ];
 
@@ -34,6 +35,10 @@ const runCommand = async function(cmd) {
       break;
     case 'renumber':
       await generator.reNumber();
+      break;
+    case 'ipfs-folder':
+      let cid = await generator.ipfsUploadFolder();
+      console.log('Folder cid', cid);
       break;
     case 'ipfs':
       const id = process.argv[3];

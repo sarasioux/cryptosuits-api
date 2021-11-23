@@ -188,6 +188,28 @@ const Generator = function() {
     }
   };
   
+  this.ipfsUploadFolder = async function() {
+    const auth = 'Basic ' + Buffer.from(ipfsProjectId + ':' + ipfsProjectSecret).toString('base64')
+    const ipfs = await create({
+      host: ipfsHost,
+      port: ipfsPort,
+      protocol: ipfsProtocol,
+      headers: {
+        authorization: auth
+      },
+      timeout: '20m'
+    });
+  
+    const path = '../assets/animation_url';
+    console.log('Uploading path', path);
+    let cid;
+    for await (const file of ipfs.addAll(globSource(path, { recursive: true }), { shardSplitThreshold: 11000, wrapWithDirectory: true })) {
+      console.log(`${file.path}: ${file.cid}`);
+      cid = file.cid;
+    }
+    return cid;
+  }
+  
 };
 
 module.exports = Generator;

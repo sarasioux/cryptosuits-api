@@ -40,6 +40,10 @@ router.get('/json/:id', function(req, res) {
                   // Set the name
                   json.name = 'CryptoSuit #' + id;
                   
+                  // Set the animation URL
+                  let parts = json.ipfs.split('/');
+                  json.animation_url = 'https://ipfs.infura.io/ipfs/QmWQ9o13irbFr7uXQ89hR3zeFnnEzunDL7dMoV6ML4yxAL/animation_url?cid=' + parts[4];
+                  
                   res.json(json);
                 } else {
                   res.json({image: siteUrl + 'suit.png'});
