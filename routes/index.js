@@ -1,5 +1,4 @@
 const express = require('express');
-const fetch = require('node-fetch');
 const Web3 = require('web3');
 const TruffleContract = require("@truffle/contract");
 const fs = require('fs');
@@ -15,7 +14,7 @@ const router = express.Router();
 let contract, deployed;
 
 // Set the reveal
-let reveal = false;
+let reveal = true;
 
 /* GET home page. */
 router.get('/', function(req, res) {
@@ -60,10 +59,16 @@ router.get('/json2/:id', function(req, res) {
   //});
 });
 
+router.get('/CryptoSuits.json', function(req, res) {
+  let rawData = fs.readFileSync(process.cwd() + '/build/contracts/CryptoSuits.json');
+  let json = JSON.parse(rawData);
+  res.json(json);
+});
+
 const initContract = async function() {
     const web3 = new Web3(Web3.givenProvider || provider);
-    const response = await fetch(siteUrl + 'contracts/CryptoSuits.json');
-    const json = await response.json();
+    let rawData = fs.readFileSync(process.cwd() + '/build/contracts/CryptoSuits.json');
+    let json = JSON.parse(rawData);
     contract = TruffleContract(json);
     contract.setProvider(web3.currentProvider);
     contract.defaults({
