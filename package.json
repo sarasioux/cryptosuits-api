@@ -8,6 +8,8 @@
   "dependencies": {
     "@truffle/contract": "^4.3.17",
     "asyncawait": "^3.0.0",
+    "canvas": "^2.8.0",
+    "convert-svg-to-png": "^0.5.0",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "express": "~4.16.1",
