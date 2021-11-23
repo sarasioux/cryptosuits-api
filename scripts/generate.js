@@ -4,6 +4,8 @@ const commands = [
   'choices',
   'ipfs 1',
   'ipfs 1-20',
+  'rehash',
+  'renumber'
   
 ];
 
@@ -26,6 +28,12 @@ const runCommand = async function(cmd) {
     case 'choices':
       let choices = await generator.suitChoices();
       //console.log(choices);
+      break;
+    case 'rehash':
+      await generator.reHash();
+      break;
+    case 'renumber':
+      await generator.reNumber();
       break;
     case 'ipfs':
       const id = process.argv[3];

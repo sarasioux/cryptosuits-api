@@ -30,7 +30,7 @@ router.get('/json/:id', function(req, res) {
         getToken(id).then((exists) => {
             if(exists) {
                 if(reveal) {
-                  const data = fs.readFileSync('./tokens/output/' + id + '.json');
+                  const data = fs.readFileSync('./tokens/output3/' + id + '.json');
                   const json = JSON.parse(data);
                   json.ipfs = json.image;
                   json.image = siteUrl + 'image/' + id;
@@ -51,7 +51,7 @@ router.get('/json2/:id', function(req, res) {
     //getToken(id).then((exists) => {
       //if(exists) {
         //if(reveal) {
-          const data = fs.readFileSync('./tokens/output/' + id + '.json');
+          const data = fs.readFileSync('./tokens/output3/' + id + '.json');
           const json = JSON.parse(data);
           res.json(json);
         //} else {
@@ -66,7 +66,7 @@ router.get('/json2/:id', function(req, res) {
 
 router.get('/image/:id', function(req, res) {
   const id = req.params.id;
-  const data = fs.readFileSync('./tokens/output/' + id + '.json');
+  const data = fs.readFileSync('./tokens/output3/' + id + '.json');
   const json = JSON.parse(data);
   let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><image href="${json.image}" height="1000" width="1000" style="image-rendering: pixelated" /></svg>`;
   convert(svg, {width: 1000, height: 1000, puppeteer: { timeout: 0, args: ['--no-sandbox', '--disable-setuid-sandbox']}}).then((png) => {

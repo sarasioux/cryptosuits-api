@@ -8,6 +8,7 @@ yarn-error.log*
 tokens/output/*.png
 tokens/json/*
 tokens/png/*
+tokens/output2/*
 
 # Runtime data
 pids

@@ -6,11 +6,14 @@
 // Imports
 const { create, globSource } = require('ipfs-http-client');
 const fs = require('fs');
+const crypto = require('crypto');
 
 // Configs
 const imageFolder = '../tokens/png/';
 const jsonFolder = '../tokens/json/';
 const outputFolder = '../tokens/output/';
+const output2Folder = '../tokens/output2/';
+const output3Folder = '../tokens/output3/';
 
 // IPFS Settings
 const ipfsHost = 'ipfs.infura.io';
@@ -93,6 +96,47 @@ const Generator = function() {
     console.log('MISSING', missing);
     console.log('EMPTY', empty);
     return files;
+  };
+  
+  this.reHash = async function() {
+    const files = await this.readDirectory(imageFolder);
+    let k=0;
+    for(let i in files) {
+      let parts = files[i].split('.');
+      let code = parts[0];
+    
+      // Load associated JSON
+      let jsonPath = jsonFolder + code + '.json';
+      if(fs.existsSync(jsonPath)) {
+        let rawData = fs.readFileSync(jsonPath, 'utf8');
+        let jsonString = rawData.toString();
+        if(jsonString.length > 0) {
+          k++;
+          
+          const path = outputFolder + k + '.json';
+          const response = fs.readFileSync(path);
+          let json = JSON.parse(response);
+          
+          let imageData = fs.readFileSync(imageFolder + files[i]);
+          let imageHash = crypto.createHash('sha256').update(imageData).digest('hex');
+          json.hash = imageHash;
+        
+          // Write new JSON
+          await fs.writeFileSync(output2Folder + imageHash + '.json', JSON.stringify(json));
+        
+          console.log(k, 'Hashed json', output2Folder + imageHash + '.json');
+        }
+      }
+    }
+  };
+  
+  this.reNumber = async function() {
+    const files = await this.readDirectory(output2Folder);
+    let k=0;
+    for(let i in files) {
+      k++;
+      await this.copy(output2Folder + files[i], output3Folder + k + '.json');
+    }
   };
   
   this.copy = async function(src, dst) {
