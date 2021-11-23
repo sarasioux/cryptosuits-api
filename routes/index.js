@@ -19,6 +19,8 @@ let contract, deployed;
 // Set the reveal
 let reveal = true;
 
+const colors = ['6a8494', '75a375', '8c5851', '8971b1'];
+
 /* GET home page. */
 router.get('/', function(req, res) {
     res.json({msg:'GTFO'});
@@ -34,6 +36,13 @@ router.get('/json/:id', function(req, res) {
                   const json = JSON.parse(data);
                   json.ipfs = json.image;
                   json.image = siteUrl + 'image/' + id;
+                  
+                  // Pick a color
+                  json.background_color = colors[id % 4];
+                  
+                  // Set the name
+                  json.name = 'CryptoSuit #' + id;
+                  
                   res.json(json);
                 } else {
                   res.json({image: siteUrl + 'suit.png'});
