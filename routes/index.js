@@ -22,14 +22,13 @@ router.get('/', function(req, res) {
     res.json({msg:'GTFO'});
 });
 
-/* GET all claimable badges. */
 router.get('/json/:id', function(req, res) {
     const id = req.params.id;
     initContract().then(() => {
         getToken(id).then((exists) => {
             if(exists) {
                 if(reveal) {
-                  const data = fs.readFileSync('./tokens/' + id);
+                  const data = fs.readFileSync('./tokens/output/' + id + '.json');
                   const json = JSON.parse(data);
                   res.json(json);
                 } else {
@@ -40,10 +39,27 @@ router.get('/json/:id', function(req, res) {
             }
         });
     });
-    
 });
 
-// Initialize the contract to check on our existing badge status
+router.get('/json2/:id', function(req, res) {
+  const id = req.params.id;
+  //initContract().then(() => {
+    //getToken(id).then((exists) => {
+      //if(exists) {
+        //if(reveal) {
+          const data = fs.readFileSync('./tokens/output/' + id + '.json');
+          const json = JSON.parse(data);
+          res.json(json);
+        //} else {
+        //  res.json({image: siteUrl + 'suit.png'});
+        //}
+      //} else {
+      //  res.json({exists: exists});
+      //}
+    //});
+  //});
+});
+
 const initContract = async function() {
     const web3 = new Web3(Web3.givenProvider || provider);
     const response = await fetch(siteUrl + 'contracts/CryptoSuits.json');
@@ -57,7 +73,6 @@ const initContract = async function() {
     deployed = await contract.deployed();
 };
 
-// Returns one rock
 const getToken = async function(id) {
     try {
         const tokenExists = await deployed.exists.call(id, {from: ownerAccount, value: 0});
