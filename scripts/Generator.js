@@ -19,8 +19,8 @@ const output3Folder = '../tokens/output3/';
 const ipfsHost = 'ipfs.infura.io';
 const ipfsPort = 5001;
 const ipfsProtocol = 'https';
-const ipfsProjectId = '21HpyrE0o3bLEOMZyzpsZB8bYMQ';
-const ipfsProjectSecret = 'd06768a0b13340c98d052fa6c9e12846';
+const ipfsProjectId = '22Enf5J1kHDzZ9mMGY48n9JJUgb';
+const ipfsProjectSecret = '1fc1890dba91b2e04503fa7b05f9a0ed';
 
 // Generator
 const Generator = function() {
@@ -44,7 +44,6 @@ const Generator = function() {
     });
   };
   this.suitChoices = async function() {
-    let returnFiles = {};
     const files = await this.readDirectory(imageFolder);
     
     let goodfiles = 0;
@@ -77,7 +76,7 @@ const Generator = function() {
           // Write new JSON
           await fs.writeFileSync(outputFolder + k + '.json', JSON.stringify(fileJson));
   
-          console.log(k, 'Found good file', jsonPath);
+          //console.log(k, 'Found good file', jsonPath);
           goodfiles++;
         } else {
           console.log('empty json file', jsonPath);
@@ -95,11 +94,13 @@ const Generator = function() {
     console.log('Empty json files', emptyfiles);
     console.log('MISSING', missing);
     console.log('EMPTY', empty);
-    return files;
   };
   
   this.reHash = async function() {
     const files = await this.readDirectory(imageFolder);
+    console.log('Found files', files.length);
+    let foundfiles = [];
+    let seen = {};
     let k=0;
     for(let i in files) {
       let parts = files[i].split('.');
@@ -120,14 +121,23 @@ const Generator = function() {
           let imageData = fs.readFileSync(imageFolder + files[i]);
           let imageHash = crypto.createHash('sha256').update(imageData).digest('hex');
           json.hash = imageHash;
+          
+          if(seen[imageHash]) {
+            console.log('Duplicate hash', imageHash, files[i], seen[imageHash]);
+          } else {
+            seen[imageHash] = files[i];
+          }
         
           // Write new JSON
           await fs.writeFileSync(output2Folder + imageHash + '.json', JSON.stringify(json));
         
-          console.log(k, 'Hashed json', output2Folder + imageHash + '.json');
+          //console.log(k, 'Hashed json', output2Folder + imageHash + '.json');
+          foundfiles.push(output2Folder + imageHash + '.json');
         }
       }
     }
+    await fs.writeFileSync('files.json', JSON.stringify(foundfiles));
+    console.log('Good files', k);
   };
   
   this.reNumber = async function() {
@@ -136,6 +146,22 @@ const Generator = function() {
     for(let i in files) {
       k++;
       await this.copy(output2Folder + files[i], output3Folder + k + '.json');
+    }
+  };
+  
+  this.checkFiles = async function() {
+    let fileData = fs.readFileSync('files.json');
+    let fileJson = JSON.parse(fileData);
+    console.log('Found files', fileJson.length);
+    let seen = {};
+    for(let f in fileJson) {
+      if(seen[fileJson[f]]) {
+        console.log('Duplicate file', seen[fileJson[f]], fileJson[f]);
+      }
+      if(!fs.existsSync(fileJson[f])) {
+        console.log('Could not find file', fileJson[f]);
+      }
+      seen[fileJson[f]] = fileJson[f];
     }
   };
   
@@ -182,6 +208,7 @@ const Generator = function() {
   };
   
   this.ipfsUploadMany = async function(low, high) {
+    console.log('Processing', low, high);
     for(let i=low; i<=high; i++) {
       console.log('Uploading image', i);
       await this.ipfsUploadOne(i);

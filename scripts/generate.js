@@ -6,7 +6,8 @@ const commands = [
   'ipfs 1-20',
   'rehash',
   'renumber',
-  'ipfs-folder'
+  'ipfs-folder',
+  'checkfiles'
   
 ];
 
@@ -47,10 +48,13 @@ const runCommand = async function(cmd) {
         break;
       } else if(id.includes('-')) {
         let parts = id.split('-');
-        await generator.ipfsUploadMany(parts[0], parts[1]);
+        await generator.ipfsUploadMany(parseInt(parts[0]), parseInt(parts[1]));
       } else {
         await generator.ipfsUploadOne(parseInt(id));
       }
+      break;
+    case 'checkfiles':
+      await generator.checkFiles();
       break;
   
     default:
