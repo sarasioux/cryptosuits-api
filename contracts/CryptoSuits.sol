@@ -46,7 +46,7 @@ contract CryptoSuits is ERC721Burnable, Ownable {
     /*
     *   Getters.
     */
-    function getCurrentId() public view returns(uint256) {
+    function totalSupply() public view returns(uint256) {
         return _tokenIds.current();
     }
 

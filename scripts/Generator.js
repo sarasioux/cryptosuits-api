@@ -19,8 +19,8 @@ const output3Folder = '../tokens/output3/';
 const ipfsHost = 'ipfs.infura.io';
 const ipfsPort = 5001;
 const ipfsProtocol = 'https';
-const ipfsProjectId = '22Enf5J1kHDzZ9mMGY48n9JJUgb';
-const ipfsProjectSecret = '1fc1890dba91b2e04503fa7b05f9a0ed';
+const ipfsProjectId = '22eBsZzQDwa3VA7IYqKu99xn3ma';
+const ipfsProjectSecret = '553a34967c1ced3a49d468836e94834d';
 
 // Generator
 const Generator = function() {
@@ -74,6 +74,7 @@ const Generator = function() {
           await this.copy(imageFolder + code + '.png', outputFolder + k + '.png');
           
           // Write new JSON
+          fileJson.code = code;
           await fs.writeFileSync(outputFolder + k + '.json', JSON.stringify(fileJson));
   
           //console.log(k, 'Found good file', jsonPath);
