@@ -1,51 +1,39 @@
-//
-// Halloweeners
-// For the spooks.
-//
-// 6,666 Halloween NFTs
-// https://halloweeners.art
-//
-// Twitter: https://twitter.com/mystoners
-//
-// Produced by:     @sircryptos
-// Art by:          @linedetail
-// Code by:         @altcryp
+
 //
 // SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.4;
 
-import '@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol';
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import '@openzeppelin/contracts/token/ERC721/ERC721.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
 import "@openzeppelin/contracts/utils/Counters.sol";
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
+import '@openzeppelin/contracts/token/ERC721/IERC721.sol';
 import '@openzeppelin/contracts/utils/math/SafeMath.sol';
 
-contract CryptoSuits is ERC721Burnable, Ownable {
+contract CryptoSuits is ERC721, Ownable, ReentrancyGuard {
     using SafeMath for uint256;
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
-    string public baseUri;
+    string public baseUri = "https://api.cryptosuits.io/json/";
+    bool private onchain;
+    ERC721 metadata;
 
     // Sales
     bool public startSale;
-    uint256 public price = 20000000000000000; //0.02 ETH
+    uint256 public price = .03 ether;
     uint public constant maxPurchase = 20;
     uint public constant maxSupply = 10000;
 
     // Team
     address private sara = 0x00796e910Bd0228ddF4cd79e3f353871a61C351C;
-    address private greg = 0x7fc55376D5A29e0Ee86C18C81bb2fC8F9f490E50;
+    address private greg = 0x3FF9f20B191C78Cae66103926E4536049AC4b944;
     address private steve = 0xBa48044540aB8cDAEe47a338844100a0aE756a8d;
 
-
-    // Constructor
     constructor() ERC721("CryptoSuits", "CRYPTOSUIT") {}
 
-    /*
-    *   Getters.
-    */
     function totalSupply() public view returns(uint256) {
         return _tokenIds.current();
     }
@@ -54,16 +42,8 @@ contract CryptoSuits is ERC721Burnable, Ownable {
         return _exists(tokenId);
     }
 
-    function saleStarted() public view returns (bool) {
-        return startSale;
-    }
-
-    /**
-    *   Public functions for minting and enforcing requirements.
-    */
-
-    function mint(uint numberOfTokens) public payable {
-        require(saleStarted(), "Wait for the sale to start!");
+    function mint(uint numberOfTokens) public payable nonReentrant {
+        require(startSale, "Wait for the sale to start!");
         require(numberOfTokens <= maxPurchase, "Maximum 20!");
         require(_tokenIds.current().add(numberOfTokens) <= maxSupply, "Exceeding max supply!");
         require(price.mul(numberOfTokens) <= msg.value, "Dont fuck around.");
@@ -74,46 +54,45 @@ contract CryptoSuits is ERC721Burnable, Ownable {
         }
     }
 
-    /**
-    *   External function for getting all tokens by a specific owner.
-    */
-    function getByOwner(address _owner) view public returns(uint256[] memory) {
-        uint256 tokenCount = balanceOf(_owner);
-        if (tokenCount == 0) {
-            return new uint256[](0);
-        } else {
-            uint256[] memory result = new uint256[](tokenCount);
-            uint256 totalTokens = _tokenIds.current();
-            uint256 resultIndex = 0;
-            for (uint256 t = 1; t <= totalTokens; t++) {
-                if (_exists(t) && ownerOf(t) == _owner) {
-                    result[resultIndex] = t;
-                    resultIndex++;
-                }
-            }
-            return result;
+    function mintTeam(uint256 numberOfTokens, address receiver) public onlyOwner {
+        require(_tokenIds.current().add(numberOfTokens) <= maxSupply, "Exceeding max supply!");
+        for(uint i = 0; i < numberOfTokens; i++) {
+            _tokenIds.increment();
+            _safeMint(receiver, _tokenIds.current());
         }
     }
 
-    /*
-    *   Owner setters.
-    */
+    function getByOwner(address owner) view public returns(uint256[] memory result) {
+        result = new uint256[](balanceOf(owner));
+        uint256 resultIndex = 0;
+        for (uint256 t = 1; t <= _tokenIds.current(); t++) {
+            if (_exists(t) && ownerOf(t) == owner) {
+                result[resultIndex] = t;
+                resultIndex++;
+            }
+        }
+    }
+
     function setBaseUri(string memory _baseUri) public onlyOwner {
         baseUri = _baseUri;
     }
 
     function setSaleStart(bool _startSale) public onlyOwner {
         startSale = _startSale;
-        emit SaleChanged(startSale);
     }
 
     function setPrice(uint256 _price) public onlyOwner {
         price = _price;
     }
 
-    /*
-    *   Money management.
-    */
+    function setMetadata(address _metadata) public onlyOwner {
+        metadata = ERC721(_metadata);
+    }
+
+    function setOnchain(bool _onchain) public onlyOwner {
+        onchain = _onchain;
+    }
+
     function withdraw() public payable onlyOwner {
         uint256 _each = address(this).balance / 3;
         require(payable(sara).send(_each));
@@ -128,6 +107,15 @@ contract CryptoSuits is ERC721Burnable, Ownable {
     /*
     *   Overrides
     */
+    function tokenURI(uint256 tokenId) override public view returns (string memory output) {
+        require(_exists(tokenId));
+        if(!onchain) {
+            output = string(abi.encodePacked(baseUri, tokenId));
+        } else {
+            output = metadata.tokenURI(tokenId);
+        }
+    }
+
     function _baseURI() internal view override returns (string memory) {
         return baseUri;
     }

@@ -180,6 +180,98 @@ const Generator = function() {
     return Function('"use strict";return (' + obj + ')')();
   };
   
+  this.updateMetadata = async function() {
+    const files = await this.readDirectory(output3Folder);
+    for(let i in files) {
+      let fileData = fs.readFileSync(output3Folder + files[i]);
+      let fileJson = JSON.parse(fileData);
+      
+      let att;
+      let changed=false;
+      for(let k in fileJson.attributes) {
+        
+        att = fileJson.attributes[k];
+        switch(att.value) {
+          case 'Slicked-back':
+            fileJson.attributes[k].value = 'Slicked Back';
+            changed=true;
+            break;
+          case 'Swoosh Hair':
+            fileJson.attributes[k].value = 'Slicked Back';
+            changed=true;
+            break;
+          case 'Regular Hair':
+            fileJson.attributes[k].value = 'The Regular';
+            changed=true;
+            break;
+          case 'Raised Eye':
+            fileJson.attributes[k].value = 'Raised Eyebrow';
+            changed=true;
+            break;
+          case 'Remy Martin':
+            fileJson.attributes[k].value = 'Remy';
+            changed=true;
+            break;
+          case 'Dom Pérignon':
+            fileJson.attributes[k].value = 'Dom';
+            changed=true;
+            break;
+          case 'Johnny Walker Double Black':
+            fileJson.attributes[k].value = 'Double Black';
+            changed=true;
+            break;
+          case 'Courvoisier':
+            fileJson.attributes[k].value = 'VSOP';
+            changed=true;
+            break;
+          case 'Peach Ciroc':
+            fileJson.attributes[k].value = 'Vodka';
+            changed=true;
+            break;
+          case 'Patek Philippe':
+            fileJson.attributes[k].value = 'Philippe';
+            changed=true;
+            break;
+          case 'TAG Heuer':
+            fileJson.attributes[k].value = 'Monaco';
+            changed=true;
+            break;
+          case 'Daytona Zenith':
+            fileJson.attributes[k].value = 'Zenith';
+            changed=true;
+            break;
+          case 'IWC Schaffhausen':
+            fileJson.attributes[k].value = 'Schaffhausen';
+            changed=true;
+            break;
+          case 'Chopard Happy Diamond':
+            fileJson.attributes[k].value = 'Happy Diamond';
+            changed=true;
+            break;
+          case 'Cartier Panthere':
+            fileJson.attributes[k].value = 'Panthere';
+            changed=true;
+            break;
+          case 'Channel Premiere':
+            fileJson.attributes[k].value = 'Première';
+            changed=true;
+            break;
+          case 'Rolex Oyster Datejust':
+            fileJson.attributes[k].value = 'Oyster';
+            changed=true;
+            break;
+        }
+      }
+      if(changed) {
+        // Write new JSON
+        await fs.writeFileSync(output3Folder + files[i], JSON.stringify(fileJson));
+        process.stdout.write("C");
+      } else {
+        process.stdout.write(".");
+      }
+    }
+  };
+  
   this.ipfsUploadOne = async function(id) {
     const auth = 'Basic ' + Buffer.from(ipfsProjectId + ':' + ipfsProjectSecret).toString('base64')
     const ipfs = await create({

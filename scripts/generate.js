@@ -7,7 +7,8 @@ const commands = [
   'rehash',
   'renumber',
   'ipfs-folder',
-  'checkfiles'
+  'checkfiles',
+  'update'
   
 ];
 
@@ -55,6 +56,9 @@ const runCommand = async function(cmd) {
       break;
     case 'checkfiles':
       await generator.checkFiles();
+      break;
+    case 'update':
+      await generator.updateMetadata();
       break;
   
     default:
