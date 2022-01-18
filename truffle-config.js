@@ -43,9 +43,10 @@ module.exports = {
     rinkeby: {
       network_id: 4, // Official ropsten network id
       provider: function () {
-        return new HDWalletProvider([privateKey], "https://rinkeby.infura.io/v3/72e71a4f135741c9861fda5ad3896e57");
+        return new HDWalletProvider([privateKey], "wss://rinkeby.infura.io/ws/v3/721b7c03aa4d4431b4d6a5f9876d116a");
       },
       timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
+      networkCheckTimeout: 999999
     },
     // Useful for testing. The `development` name is special - truffle uses it by default
     // if it's defined here and no other network is specified at the command line.
@@ -116,5 +117,9 @@ module.exports = {
   plugins: [
     'truffle-plugin-verify',
     'truffle-contract-size'
-  ]
+  ],
+  
+  api_keys: {
+    etherscan: 'HF9EK4BII51667YK31CTYR92MKIHWDF3S6'
+  }
 };

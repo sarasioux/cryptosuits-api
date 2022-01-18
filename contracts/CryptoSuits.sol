@@ -17,7 +17,7 @@ contract CryptoSuits is ERC721, Ownable, ReentrancyGuard {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
-    string public baseUri = "https://api.cryptosuits.io/json/";
+    string public baseUri = "https://cryptosuits.herokuapp.com/json/";
     bool private onchain;
     ERC721 metadata;
 
@@ -26,13 +26,18 @@ contract CryptoSuits is ERC721, Ownable, ReentrancyGuard {
     uint256 public price = .03 ether;
     uint public constant maxPurchase = 20;
     uint public constant maxSupply = 10000;
+    uint private constant maxTeamMint = 100;
 
     // Team
     address private sara = 0x00796e910Bd0228ddF4cd79e3f353871a61C351C;
     address private greg = 0x3FF9f20B191C78Cae66103926E4536049AC4b944;
     address private steve = 0xBa48044540aB8cDAEe47a338844100a0aE756a8d;
 
-    constructor() ERC721("CryptoSuits", "CRYPTOSUIT") {}
+    constructor() ERC721("CryptoSuits", "CRYPTOSUIT") {
+        mintTeam(10, sara);
+        mintTeam(10, greg);
+        mintTeam(10, steve);
+    }
 
     function totalSupply() public view returns(uint256) {
         return _tokenIds.current();
@@ -43,10 +48,10 @@ contract CryptoSuits is ERC721, Ownable, ReentrancyGuard {
     }
 
     function mint(uint numberOfTokens) public payable nonReentrant {
-        require(startSale, "Wait for the sale to start!");
-        require(numberOfTokens <= maxPurchase, "Maximum 20!");
-        require(_tokenIds.current().add(numberOfTokens) <= maxSupply, "Exceeding max supply!");
-        require(price.mul(numberOfTokens) <= msg.value, "Dont fuck around.");
+        require(startSale);
+        require(numberOfTokens <= maxPurchase);
+        require(_tokenIds.current().add(numberOfTokens) <= maxSupply);
+        require(price.mul(numberOfTokens) <= msg.value);
 
         for(uint i = 0; i < numberOfTokens; i++) {
             _tokenIds.increment();
@@ -55,7 +60,8 @@ contract CryptoSuits is ERC721, Ownable, ReentrancyGuard {
     }
 
     function mintTeam(uint256 numberOfTokens, address receiver) public onlyOwner {
-        require(_tokenIds.current().add(numberOfTokens) <= maxSupply, "Exceeding max supply!");
+        require(_tokenIds.current().add(numberOfTokens) <= maxSupply);
+        require(_tokenIds.current().add(numberOfTokens) <= maxTeamMint);
         for(uint i = 0; i < numberOfTokens; i++) {
             _tokenIds.increment();
             _safeMint(receiver, _tokenIds.current());
@@ -110,7 +116,7 @@ contract CryptoSuits is ERC721, Ownable, ReentrancyGuard {
     function tokenURI(uint256 tokenId) override public view returns (string memory output) {
         require(_exists(tokenId));
         if(!onchain) {
-            output = string(abi.encodePacked(baseUri, tokenId));
+            output = string(abi.encodePacked(baseUri, toString(tokenId)));
         } else {
             output = metadata.tokenURI(tokenId);
         }
@@ -118,6 +124,26 @@ contract CryptoSuits is ERC721, Ownable, ReentrancyGuard {
 
     function _baseURI() internal view override returns (string memory) {
         return baseUri;
+    }
+
+
+    function toString(uint256 value) public pure returns (string memory) {
+        if (value == 0) {
+            return "0";
+        }
+        uint256 temp = value;
+        uint256 digits;
+        while (temp != 0) {
+            digits++;
+            temp /= 10;
+        }
+        bytes memory buffer = new bytes(digits);
+        while (value != 0) {
+            digits -= 1;
+            buffer[digits] = bytes1(uint8(48 + uint256(value % 10)));
+            value /= 10;
+        }
+        return string(buffer);
     }
 
     receive () external payable virtual {}
