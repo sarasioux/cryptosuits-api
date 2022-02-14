@@ -17,7 +17,7 @@ contract CryptoSuits is ERC721, Ownable, ReentrancyGuard {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
-    string public baseUri = "https://cryptosuits.herokuapp.com/json/";
+    string public baseUri;
     bool private onchain;
     ERC721 metadata;
 

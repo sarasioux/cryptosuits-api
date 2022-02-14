@@ -48,6 +48,15 @@ module.exports = {
       timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
       networkCheckTimeout: 999999
     },
+    main: {
+      network_id: 1, // Official ropsten network id
+      provider: function () {
+        return new HDWalletProvider([privateKey], "wss://mainnet.infura.io/ws/v3/72e71a4f135741c9861fda5ad3896e57");
+      },
+      timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
+      gasPrice: 60000000000,  // 100
+      networkCheckTimeout: 999999
+    },
     // Useful for testing. The `development` name is special - truffle uses it by default
     // if it's defined here and no other network is specified at the command line.
     // You should run a client (like ganache-cli, geth or parity) in a separate terminal

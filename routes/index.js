@@ -8,7 +8,7 @@ const { convert } = require('convert-svg-to-png');
 // Constants
 const siteUrl = 'https://cryptosuits.herokuapp.com/';
 //const siteUrl = 'http://localhost:3000/';
-const provider = 'wss://rinkeby.infura.io/ws/v3/721b7c03aa4d4431b4d6a5f9876d116a';
+const provider = 'wss://mainnet.infura.io/ws/v3/721b7c03aa4d4431b4d6a5f9876d116a';
 //const provider = 'http://127.0.0.1:7545';
 const ownerAccount = '0x00796e910Bd0228ddF4cd79e3f353871a61C351C';                  // Address of the current queryer
 
