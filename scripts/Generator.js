@@ -300,6 +300,34 @@ const Generator = function() {
     console.log('Uploaded file', cid);
   };
   
+  this.ipfsFixOne = async function(id) {
+    const auth = 'Basic ' + Buffer.from(ipfsProjectId + ':' + ipfsProjectSecret).toString('base64')
+    const ipfs = await create({
+      host: ipfsHost,
+      port: ipfsPort,
+      protocol: ipfsProtocol,
+      headers: {
+        authorization: auth
+      },
+      timeout: '20m'
+    });
+    
+    const jsonPath = output3Folder + id + '.json';
+    
+    // Load the existing JSON
+    let rawData = fs.readFileSync(jsonPath);
+    let fileJson = JSON.parse(rawData);
+    
+    const imagePath = String(outputFolder + id + '.png');
+    const { cid } = await ipfs.add(globSource(imagePath));
+    fileJson.image = 'https://ipfs.infura.io/ipfs/' + String(cid);
+    
+    let data = JSON.stringify(fileJson);
+    fs.writeFileSync(jsonPath, data);
+    
+    console.log('Uploaded file', cid);
+  };
+  
   this.ipfsUploadMany = async function(low, high) {
     console.log('Processing', low, high);
     for(let i=low; i<=high; i++) {

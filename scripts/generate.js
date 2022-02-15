@@ -8,7 +8,8 @@ const commands = [
   'renumber',
   'ipfs-folder',
   'checkfiles',
-  'update'
+  'update',
+  'fix'
   
 ];
 
@@ -59,6 +60,10 @@ const runCommand = async function(cmd) {
       break;
     case 'update':
       await generator.updateMetadata();
+      break;
+    case 'fix':
+      let fixid = process.argv[3];
+      await generator.ipfsFixOne(fixid);
       break;
   
     default:
